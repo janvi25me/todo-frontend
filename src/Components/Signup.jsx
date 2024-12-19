@@ -16,17 +16,19 @@ const Signup = () => {
     resolver: zodResolver(userValidationSchema),
   });
 
+  const url = "http://localhost:1000/api/user";
+
   //Signup API
   const signup = async (data) => {
     try {
-      await axios.post(`http://localhost:1000/api/user/signup`, data, {
+      const response = await axios.post(`${url}/signup`, data, {
         headers: {
           "Content-Type": "application/json",
         },
         withCredentials: true,
       });
       toast.success("Success..Redirecting");
-      // console.log("Signup successful:", response);
+      console.log("Signup successful:", response);
       navigate("/login");
     } catch (err) {
       console.log("Error signing up", err);
@@ -36,16 +38,28 @@ const Signup = () => {
 
   const onSubmit = (data) => {
     // console.log("Form submitted successfully:", data);
+
+    const roleMap = {
+      buyer: "1",
+      seller: "2",
+    };
+
+    const transformedData = {
+      ...data,
+      role: roleMap[data.role], // "buyer" -> "1", "seller" -> "2"
+    };
+    data = transformedData;
     signup(data);
+    // console.log("Tranformed data", data);
   };
 
   return (
     <>
-      <Toaster richColors position="top-right" />
+      <Toaster richColors position="top-left" />
+      <h3 className="text-center text-xl font-semibold mb-4">
+        User Registration
+      </h3>
       <div className="my-5 p-6 container mx-auto max-w-lg border-2 bg-gray-100 rounded-lg">
-        <h3 className="text-center text-xl font-semibold mb-4">
-          User Registration
-        </h3>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="relative mb-5">
             <input
@@ -108,6 +122,26 @@ const Signup = () => {
               <p className="text-red-500 text-sm mt-1">
                 {errors.password.message}
               </p>
+            )}
+          </div>
+
+          <div className="relative mb-5">
+            <label htmlFor="role">Select Role:</label>
+            <select
+              {...register("role")}
+              name="role"
+              id="role"
+              defaultValue=""
+              className="border border-gray-300 rounded-md p-2"
+            >
+              <option value="" disabled>
+                Select Role
+              </option>
+              <option value="buyer"> 1. Buyer</option>
+              <option value="seller">2. Seller</option>
+            </select>
+            {errors.role && (
+              <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>
             )}
           </div>
 

@@ -3,61 +3,63 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Toaster, toast } from "sonner";
-import { userValidationSchema } from "./Validation";
+import { userValidationSchemaForLogin } from "./Validation";
 import { useContext } from "react";
 import { AuthContext } from "../Context/AuthContext";
 
 const Login = () => {
   let navigate = useNavigate();
-
-  const { token, setToken } = useContext(AuthContext);
-
+  const { setToken, setUserInfo } = useContext(AuthContext);
+  // console.log("--", userInfo);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(userValidationSchema),
+    resolver: zodResolver(userValidationSchemaForLogin),
   });
 
-  //Signup API
+  const url = "http://localhost:1000/api/user";
+
   const login = async (data) => {
     try {
-      const response = await axios.post(
-        `http://localhost:1000/api/user/login`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      toast.success("Success..Redirecting");
-      const apiToken = response.data.token;
-      if (apiToken) {
-        localStorage.setItem("token", token);
-        setToken(apiToken);
-      }
+      const response = await axios.post(`${url}/login`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
 
-      // console.log("Login successful:", response.data);
-      navigate("/");
+      // toast.success("Success..Redirecting");
+      console.log("Login successful:", response.data);
+
+      const { token, ...userDetails } = response.data;
+      setToken(token);
+      setUserInfo(userDetails);
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(userDetails));
+
+      navigate("/todo");
     } catch (err) {
-      console.log("Error signing in", err);
+      console.log(
+        "Error signing in",
+        err.response ? err.response.data : err.message
+      );
       toast.error("Please try again");
     }
   };
 
-  const onSubmit = (data) => {
-    // console.log("Form submitted successfully:", data);
-    login(data);
+  const onSubmit = async (data) => {
+    console.log("Form data:", data);
+    await login(data);
   };
 
   return (
     <>
-      <Toaster richColors position="top-right" />
-      <div className="my-5 p-6 container mx-auto max-w-lg border-2 bg-gray-100 rounded-lg">
-        <h3 className="text-center text-xl font-semibold mb-4">Login</h3>
+      <Toaster richColors position="top-left" />
+      <h3 className="text-center text-xl font-semibold mb-4">User Login</h3>
+      <div className="my-8  p-6 container mx-auto max-w-lg border-2 bg-gray-100 rounded-lg">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="relative mb-5">
             <input
