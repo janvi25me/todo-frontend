@@ -8,7 +8,7 @@ const Order = () => {
   const [activeTab, setActiveTab] = useState("today");
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  console.log(setLoading);
   const filterOrders = (type, ordersList) => {
     const today = new Date().toISOString().split("T")[0];
     // console.log("Today's date:", today);
