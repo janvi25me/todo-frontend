@@ -2,43 +2,56 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { userValidationSchema } from "./Validation";
 
 const Signup = () => {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm({
     resolver: zodResolver(userValidationSchema),
   });
 
   const url = "http://localhost:1000/api/user";
+  const selectedRoleName = watch("role");
 
-  //Signup API
   const signup = async (data) => {
     try {
-      const response = await axios.post(`${url}/signup`, data, {
+      const formData = new FormData();
+      for (const key in data) {
+        if (key === "image" && data.image?.length > 0) {
+          formData.append("image", data.image[0]);
+        } else {
+          formData.append(key, data[key]);
+        }
+      }
+
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
+      }
+
+      const response = await axios.post(`${url}/signup`, formData, {
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
         withCredentials: true,
       });
+
       toast.success("Success..Redirecting");
       console.log("Signup successful:", response);
       navigate("/login");
     } catch (err) {
-      console.log("Error signing up", err);
+      console.error("Error signing up", err);
       toast.error("Please try again");
     }
   };
 
   const onSubmit = (data) => {
-    // console.log("Form submitted successfully:", data);
-
     const roleMap = {
       buyer: "1",
       seller: "2",
@@ -46,16 +59,15 @@ const Signup = () => {
 
     const transformedData = {
       ...data,
-      role: roleMap[data.role], // "buyer" -> "1", "seller" -> "2"
+      role: roleMap[data.role],
     };
-    data = transformedData;
-    signup(data);
-    // console.log("Tranformed data", data);
+
+    signup(transformedData);
+    // console.log("Transformed data", transformedData);
   };
 
   return (
     <>
-      <Toaster richColors position="top-left" />
       <h3 className="text-center text-xl font-semibold mb-4">
         User Registration
       </h3>
@@ -64,20 +76,68 @@ const Signup = () => {
           <div className="relative mb-5">
             <input
               type="text"
-              {...register("name")}
-              name="name"
-              id="name"
+              {...register("firstName", { required: "First Name is required" })}
+              name="firstName"
+              id="firstName"
               className="peer w-full px-3 pt-5 pb-2 border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
               placeholder=" "
             />
             <label
-              htmlFor="name"
+              htmlFor="firstName"
               className="absolute left-3 top-2 text-gray-500 text-sm transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-blue-500"
             >
-              Name
+              FirstName
             </label>
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+            {errors.firstName && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.firstName.message}
+              </p>
+            )}
+          </div>
+
+          <div className="relative mb-5">
+            <input
+              type="text"
+              {...register("middleName", {
+                required: "Middle Name is required",
+              })}
+              name="middleName"
+              id="middleName"
+              className="peer w-full px-3 pt-5 pb-2 border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+              placeholder=" "
+            />
+            <label
+              htmlFor="middleName"
+              className="absolute left-3 top-2 text-gray-500 text-sm transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-blue-500"
+            >
+              MiddleName
+            </label>
+            {errors.middleName && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.middleName.message}
+              </p>
+            )}
+          </div>
+
+          <div className="relative mb-5">
+            <input
+              type="text"
+              {...register("lastName", { required: "Last Name is required" })}
+              name="lastName"
+              id="lastName"
+              className="peer w-full px-3 pt-5 pb-2 border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+              placeholder=" "
+            />
+            <label
+              htmlFor="lastName"
+              className="absolute left-3 top-2 text-gray-500 text-sm transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-blue-500"
+            >
+              LastName
+            </label>
+            {errors.lastName && errors.lastName.message && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.lastName.message}
+              </p>
             )}
           </div>
 
@@ -96,7 +156,7 @@ const Signup = () => {
             >
               Email
             </label>
-            {errors.email && (
+            {errors.email && errors.email.message && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.email.message}
               </p>
@@ -118,15 +178,84 @@ const Signup = () => {
             >
               Password
             </label>
-            {errors.password && (
+            {errors.password && errors.password.message && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.password.message}
               </p>
             )}
           </div>
 
+          {/* <div className="relative mb-5">
+            <input
+              type="file"
+              accept=".jpg, .png, .jpeg"
+              {...register("image", { required: "Profile Image is required" })}
+              name="image"
+              id="image"
+              className="peer w-full px-3 pt-5 pb-2 border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+              placeholder=" "
+            />
+            <label
+              htmlFor="image"
+              className="absolute left-3 top-2 text-gray-500 text-sm transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-blue-500"
+            >
+              Profile Image
+            </label>
+            {errors.image && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.image.message}
+              </p>
+            )}
+          </div> */}
+
           <div className="relative mb-5">
-            <label htmlFor="role">Select Role:</label>
+            <input
+              type="text"
+              {...register("contact")}
+              name="contact"
+              id="contact"
+              className="peer w-full px-3 pt-5 pb-2 border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+              placeholder=" "
+            />
+            <label
+              htmlFor="contact"
+              className="absolute left-3 top-2 text-gray-500 text-sm transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-blue-500"
+            >
+              Contact
+            </label>
+            {errors.contact && errors.contact.message && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.contact.message}
+              </p>
+            )}
+          </div>
+
+          {selectedRoleName === "seller" && (
+            <div className="relative mb-5">
+              <input
+                type="text"
+                {...register("shopName")}
+                name="shopName"
+                id="shopName"
+                className="peer w-full px-3 pt-5 pb-2 border-2 border-gray-300 rounded-lg outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                placeholder=" "
+              />
+              <label
+                htmlFor="shopName"
+                className="absolute left-3 top-2 text-gray-500 text-sm transition-all peer-placeholder-shown:top-5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-sm peer-focus:text-blue-500"
+              >
+                ShopName
+              </label>
+              {errors.shopName && errors.shopName.message && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.shopName.message}
+                </p>
+              )}
+            </div>
+          )}
+
+          <div className="relative mb-5">
+            <label htmlFor="role"></label>
             <select
               {...register("role")}
               name="role"

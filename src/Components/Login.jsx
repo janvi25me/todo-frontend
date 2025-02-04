@@ -2,7 +2,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { userValidationSchemaForLogin } from "./Validation";
 import { useContext } from "react";
 import { AuthContext } from "../Context/AuthContext";
@@ -31,7 +31,7 @@ const Login = () => {
       });
 
       // toast.success("Success..Redirecting");
-      console.log("Login successful:", response.data);
+      // console.log("Login successful:", response.data);
 
       const { token, ...userDetails } = response.data;
       setToken(token);
@@ -40,7 +40,7 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userDetails));
 
-      navigate("/todo");
+      navigate("/");
     } catch (err) {
       console.log(
         "Error signing in",
@@ -51,13 +51,12 @@ const Login = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log("Form data:", data);
+    // console.log("Form data:", data);
     await login(data);
   };
 
   return (
     <>
-      <Toaster richColors position="top-left" />
       <h3 className="text-center text-xl font-semibold mb-4">User Login</h3>
       <div className="my-8  p-6 container mx-auto max-w-lg border-2 bg-gray-100 rounded-lg">
         <form onSubmit={handleSubmit(onSubmit)}>

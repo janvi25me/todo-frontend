@@ -1,0 +1,13 @@
+.profile-initials {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: #875785;  /* Blue background color (change as per preference) */
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    border-radius: 50%; /* Ensure the div is circular */
+  }
+  

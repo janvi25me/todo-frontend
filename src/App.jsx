@@ -5,21 +5,26 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
-// import Navbar from "./Components/Navbar";
 import Login from "./Components/Login";
 import Signup from "./Components/Signup";
-import TodoList from "./Components/Todo/TodoList";
+import ProductList from "./Components/Product/ProductList";
 import { useContext } from "react";
 import { AuthContext } from "./Context/AuthContext";
 import Layout from "./Layout/Layout";
 import NotFound from "./page/NotFound/NotFound";
+import Cart from "./page/Cart";
+import Home from "./Components/Home";
+import Address from "./page/Address";
+import Order from "./page/Order";
+import UserProfile from "./page/UserProfile";
+import OrderDetails from "./page/OrderDetails";
 
 const App = () => {
   const { userInfo } = useContext(AuthContext);
-  // console.log(">>>", userInfo);
+
   const userLoggedInLoader = () => {
     if (userInfo?.user?.token) {
-      return redirect("/todo");
+      return redirect("/product");
     }
     return null;
   };
@@ -30,10 +35,12 @@ const App = () => {
     }
     return null;
   };
+
   const routers = createBrowserRouter(
     createRoutesFromElements(
       <>
         <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
           <Route
             path="signup"
             element={<Signup />}
@@ -41,8 +48,29 @@ const App = () => {
           />
           <Route path="login" element={<Login />} loader={userLoggedInLoader} />
           <Route
-            path="todo"
-            element={<TodoList />}
+            path="product"
+            element={<ProductList />}
+            loader={userCanAccessLoader}
+          />
+          <Route path="cart" element={<Cart />} loader={userCanAccessLoader} />
+          <Route
+            path="user"
+            element={<UserProfile />}
+            loader={userCanAccessLoader}
+          />
+          <Route
+            path="order"
+            element={<Order />}
+            loader={userCanAccessLoader}
+          />
+          <Route
+            path="orderDetails/:orderId"
+            element={<OrderDetails />}
+            loader={userCanAccessLoader}
+          />
+          <Route
+            path="address"
+            element={<Address />}
             loader={userCanAccessLoader}
           />
           <Route path="*" element={<NotFound />} />
@@ -50,6 +78,7 @@ const App = () => {
       </>
     )
   );
+
   return (
     <>
       <RouterProvider router={routers} />
