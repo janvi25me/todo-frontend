@@ -27,12 +27,12 @@ const Home = () => {
               >
                 See All Products
               </Link>
-              <Link
+              {/* <Link
                 to="/cart"
                 className="block w-full px-6 py-3 bg-green-500 text-white font-medium text-lg rounded-lg shadow-md hover:bg-green-600 hover:scale-105 transition transform duration-300"
               >
                 My Cart
-              </Link>
+              </Link> */}
               <Link
                 to="/address"
                 className="block w-full px-6 py-3 bg-blue-500 text-white font-medium text-lg rounded-lg shadow-md hover:bg-blue-600 hover:scale-105 transition transform duration-300"
@@ -42,7 +42,7 @@ const Home = () => {
             </>
           ) : (
             <div className="text-center text-lg text-white">
-              <p>Welcome Admin.</p>
+              {/* <p>Welcome Admin.</p> */}
               <Link
                 to="/product"
                 className="block w-full px-6 py-3 bg-purple-600 text-white font-medium text-lg rounded-lg shadow-md hover:bg-purple-700 hover:scale-105 transition transform duration-300"

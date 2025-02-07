@@ -64,7 +64,7 @@ const App = () => {
             loader={userCanAccessLoader}
           />
           <Route
-            path="orderDetails/:orderId"
+            path="/orderDetails"
             element={<OrderDetails />}
             loader={userCanAccessLoader}
           />

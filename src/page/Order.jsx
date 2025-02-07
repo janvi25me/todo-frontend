@@ -1,34 +1,27 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Context/AuthContext";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
 
 const Order = () => {
   const { baseUrl, orders } = useContext(AuthContext);
   console.log("orders Page API", orders);
+
   const [activeTab, setActiveTab] = useState("today");
   const [filteredOrders, setFilteredOrders] = useState([]);
-  const [loading, setLoading] = useState(false);
-  console.log(setLoading);
+  const [loading, setLoading] = useState(true); // ✅ Initialize loading as true
+  const navigate = useNavigate(); // ✅ Initialize navigate
+
   const filterOrders = (type, ordersList) => {
+    setLoading(true); // ✅ Start loading
     const today = new Date().toISOString().split("T")[0];
-    // console.log("Today's date:", today);
 
-    let filteredOrders;
+    let filteredOrders =
+      type === "today"
+        ? ordersList.filter((order) => order.createdAt.split("T")[0] === today)
+        : ordersList.filter((order) => order.createdAt.split("T")[0] !== today);
 
-    if (type === "today") {
-      filteredOrders = ordersList.filter((order) => {
-        const orderDate = order.createdAt.split("T")[0];
-        return orderDate === today;
-      });
-    } else if (type === "other") {
-      filteredOrders = ordersList.filter((order) => {
-        const orderDate = order.createdAt.split("T")[0];
-        return orderDate !== today;
-      });
-    }
-
-    // console.log("Filtered orders:", filteredOrders);
     setFilteredOrders(filteredOrders);
+    setLoading(false); // ✅ Stop loading
   };
 
   const handleTabSwitch = (tab) => {
@@ -46,6 +39,7 @@ const Order = () => {
         Your Orders
       </h2>
 
+      {/* Tabs for switching between orders */}
       <div className="flex justify-center mb-6">
         <button
           onClick={() => handleTabSwitch("today")}
@@ -55,7 +49,7 @@ const Order = () => {
               : "bg-gray-300 text-gray-800"
           }`}
         >
-          Todays Orders
+          Today{"'"}s Orders
         </button>
         <button
           onClick={() => handleTabSwitch("other")}
@@ -65,10 +59,11 @@ const Order = () => {
               : "bg-gray-300 text-gray-800"
           }`}
         >
-          Other Days Orders
+          Previous Orders
         </button>
       </div>
 
+      {/* Conditional rendering for loading & no orders */}
       {loading ? (
         <p className="text-center text-gray-500">Loading orders...</p>
       ) : filteredOrders.length === 0 ? (
@@ -78,10 +73,11 @@ const Order = () => {
           {filteredOrders.map((order) => (
             <div
               key={order._id}
-              className="bg-gray-50 p-6 rounded-lg shadow border border-gray-300 hover:shadow-lg transition"
+              onClick={() => navigate(`/orderDetails/${order._id}`)}
+              className="bg-gray-50 p-6 rounded-lg shadow border border-gray-300 hover:shadow-lg transition cursor-pointer"
             >
               <div className="flex justify-between items-center">
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-lg font-semibold text-purple-600 ">
                   Order ID: {order._id}
                 </p>
                 <p className="text-sm font-medium text-white bg-yellow-500 px-3 py-1 rounded-full">
@@ -102,18 +98,14 @@ const Order = () => {
                   <p className="text-gray-700 font-medium">
                     Product: {order.products[0]?.name || "N/A"}
                   </p>
+                  <p className="text-gray-500 text-sm">
+                    Qty: {order.products[0]?.qty}
+                  </p>
                   <p className="text-gray-600">Total: ₹{order.total}</p>
                   <p className="text-gray-500 text-sm">
                     Date: {order.createdAt.split("T")[0]}
                   </p>
                 </div>
-
-                <Link
-                  to={`/orderDetails/${order._id}`}
-                  className="bg-purple-600 text-white px-3 py-1 rounded-md hover:bg-purple-700 transition"
-                >
-                  View Details
-                </Link>
               </div>
             </div>
           ))}

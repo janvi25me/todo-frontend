@@ -20,7 +20,7 @@ const AuthProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
-  const [orders, setOrders] = useState([]);
+  // const [orders, setOrders] = useState([]);
   // const [loading, setLoading] = useState(false);
   const [userInfo, setUserInfo] = useState(() => {
     const storedUser = localStorage.getItem("user");
@@ -29,7 +29,7 @@ const AuthProvider = ({ children }) => {
   });
 
   const url = "http://localhost:1000/api";
-  let baseUrl = "https://42c4-103-106-20-199.ngrok-free.app";
+  let baseUrl = "https://526d-103-106-20-199.ngrok-free.app";
 
   //get user Token
   useEffect(() => {
@@ -79,17 +79,9 @@ const AuthProvider = ({ children }) => {
     getAllAddress();
   }, [reload, token]);
 
-  useEffect(() => {
-    fetchOrders();
-  }, [reload, token]);
-
-  //logout
-  // const logout = () => {
-  //   setToken(null);
-  //   setUserInfo(null);
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("user");
-  // };
+  // useEffect(() => {
+  //   fetchOrders();
+  // }, [reload, token]);
 
   //addToCart API
   const addToCart = async (productId) => {
@@ -248,52 +240,50 @@ const AuthProvider = ({ children }) => {
   }, [address]);
 
   //createOrder API
-  const createOrder = async () => {
-    try {
-      const response = await axios.post(
-        `${url}/order/createOrder`,
-        {
-          items: cart?.data?.items,
-          total: cart?.data?.total,
-          delivery: cart?.data?.delivery,
-          address: selectedDeliverAddress,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            auth: token,
-          },
-        }
-      );
-      if (response.data.success) {
-        setOrders(response.data.data);
-      } else {
-        alert("Failed to create order. Please try again.");
-      }
-      toast.success("Order created successfully");
-    } catch (err) {
-      console.error("Error creating order:", err.response?.data || err.message);
-      alert("Failed to create order. Please try again.");
-    }
-  };
+  // const createOrder = async (selectedDeliverAddress, cartData) => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${url}/order/createOrder`,
+  //       {
+  //         items: cartData?.items,
+  //         total: cartData?.total,
+  //         delivery: cartData?.delivery,
+  //         address: selectedDeliverAddress,
+  //       },
+  //       {
+  //         headers: { "Content-Type": "application/json", auth: token },
+  //       }
+  //     );
+  //     if (response.data.success) {
+  //       setOrders(response.data.data);
+  //       toast.success("Order created successfully");
+  //     } else {
+  //       toast.error("Failed to create order. Please try again.");
+  //     }
+  //   } catch (err) {
+  //     console.error("Error creating order:", err.response?.data || err.message);
+  //     toast.error("Failed to create order. Please try again.");
+  //   }
+  // };
 
-  const fetchOrders = async () => {
-    try {
-      const response = await axios.get(`${url}/order/buyerOrders`, {
-        headers: {
-          "Content-Type": "application/json",
-          auth: token,
-        },
-      });
+  //Buyer Order Filters
+  // const fetchOrders = async () => {
+  //   try {
+  //     const response = await axios.get(`${url}/order/buyerOrders`, {
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         auth: token,
+  //       },
+  //     });
 
-      console.log("API Response:", response.data);
-      if (response.data.success) {
-        setOrders(response.data.orders);
-      }
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-  };
+  //     // console.log("API Response:", response.data);
+  //     if (response.data.success) {
+  //       setOrders(response.data.orders);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching orders:", error);
+  //   }
+  // };
 
   return (
     <AuthContext.Provider
@@ -326,10 +316,9 @@ const AuthProvider = ({ children }) => {
         setMaxPrice,
         baseUrl,
         url,
-        orders,
-        setOrders,
-        createOrder,
-        fetchOrders,
+        // orders,
+        // setOrders,
+        // createOrder,
       }}
     >
       {children}

@@ -61,7 +61,7 @@ const ProductList = () => {
         withCredentials: true,
       });
 
-      console.log("AT ADDTASK", response.data);
+      // console.log("AT ADDTASK", response.data);
 
       setAddTask({ name: "", description: "", price: "" });
       setImage(null); // Clear the file input state
@@ -177,7 +177,7 @@ const ProductList = () => {
     setIsOpen(!isOpen);
   };
 
-  let baseUrl = "https://42c4-103-106-20-199.ngrok-free.app";
+  let baseUrl = "https://526d-103-106-20-199.ngrok-free.app";
   // let imagePath = products?.image?.replace(/\\/g, "/");
 
   return (
@@ -322,7 +322,7 @@ const ProductList = () => {
                         <p className="text-sm text-gray-600">
                           {todo?.description}
                         </p>
-                        <p className="text-sm text-gray-600">{todo?.price}</p>
+                        <p className="text-sm text-gray-600">₹{todo?.price}</p>
                         <p className="text-xs text-gray-500 mt-2">
                           {new Date(todo?.createdAt).toLocaleTimeString(
                             "en-us",

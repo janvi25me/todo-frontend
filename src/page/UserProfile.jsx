@@ -170,7 +170,8 @@ const UserProfile = () => {
                 onClick={handleYourOrders}
                 className="px-4 py-2 border rounded-md bg-green-500 text-white"
               >
-                Your Orders
+                <i className="fa-solid fa-clock-rotate-left"></i> &nbsp; Order
+                History
               </button>
             </div>
           </div>

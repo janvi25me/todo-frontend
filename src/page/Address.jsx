@@ -180,12 +180,12 @@ const Address = () => {
                     >
                       Update
                     </button>
-                    {/* <button
+                    <button
                       className="px-3 py-1 border border-gray-300 text-gray-600 rounded-lg"
                       onClick={() => deleteAddress(item._id)}
                     >
                       Remove
-                    </button> */}
+                    </button>
                   </div>
                 </div>
               );
