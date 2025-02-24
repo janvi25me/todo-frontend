@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../Context/AuthContext";
+import { AuthContext } from "../../Context/AuthContext";
 import { toast } from "sonner";
 
 const Navbar = () => {
@@ -27,17 +27,14 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Center: Search Bar */}
-          {/* <div className="flex items-center flex-grow justify-center">
-            <input
-              type="text"
-              placeholder="Search for products"
-              className="border border-gray-300 rounded-lg p-2 w-full max-w-md focus:outline-none focus:ring focus:ring-blue-500"
-            />
-          </div> */}
-
-          {/* Right: Cart & Logout/Authentication */}
           <div className="flex items-center gap-4">
+            <Link
+              to="/order"
+              className="bg-blue-500 text-white rounded-lg border border-blue-500 p-2"
+            >
+              Orders
+            </Link>
+
             {userInfo?.user?.role === "1" && (
               <Link
                 to="/cart"

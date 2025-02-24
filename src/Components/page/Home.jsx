@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import aaa from "../assets/aaa.jpg";
+import aaa from "../../assets/aaa.jpg";
 import { useContext } from "react";
-import { AuthContext } from "../Context/AuthContext";
+import { AuthContext } from "../../Context/AuthContext";
 
 const Home = () => {
   const { userInfo } = useContext(AuthContext);
@@ -27,12 +27,12 @@ const Home = () => {
               >
                 See All Products
               </Link>
-              {/* <Link
+              <Link
                 to="/cart"
                 className="block w-full px-6 py-3 bg-green-500 text-white font-medium text-lg rounded-lg shadow-md hover:bg-green-600 hover:scale-105 transition transform duration-300"
               >
                 My Cart
-              </Link> */}
+              </Link>
               <Link
                 to="/address"
                 className="block w-full px-6 py-3 bg-blue-500 text-white font-medium text-lg rounded-lg shadow-md hover:bg-blue-600 hover:scale-105 transition transform duration-300"
@@ -50,10 +50,10 @@ const Home = () => {
                 See All Products
               </Link>
               <Link
-                to="/order"
+                to="/order/history"
                 className="block w-full mt-3 px-6 py-3 bg-blue-500 text-white font-medium text-lg rounded-lg shadow-md hover:bg-blue-600 hover:scale-105 transition transform duration-300"
               >
-                Orders Page
+                Order History
               </Link>
             </div>
           )}

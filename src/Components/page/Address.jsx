@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import axios from "axios";
-import { AuthContext } from "../Context/AuthContext";
+import { AuthContext } from "../../Context/AuthContext";
 import { toast } from "sonner";
 
 const Address = () => {

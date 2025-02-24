@@ -20,8 +20,7 @@ const AuthProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
-  // const [orders, setOrders] = useState([]);
-  // const [loading, setLoading] = useState(false);
+  // const [ordersData, setOrdersData] = useState([]);
   const [userInfo, setUserInfo] = useState(() => {
     const storedUser = localStorage.getItem("user");
 
@@ -29,7 +28,8 @@ const AuthProvider = ({ children }) => {
   });
 
   const url = "http://localhost:1000/api";
-  let baseUrl = "https://526d-103-106-20-199.ngrok-free.app";
+  let imgUrl = "http://localhost:1000";
+  // let baseUrl = "https://b785-103-106-20-199.ngrok-free.app";
 
   //get user Token
   useEffect(() => {
@@ -239,51 +239,41 @@ const AuthProvider = ({ children }) => {
     setSelectedDeliverAddress(deliverAddress || null);
   }, [address]);
 
-  //createOrder API
-  // const createOrder = async (selectedDeliverAddress, cartData) => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${url}/order/createOrder`,
-  //       {
-  //         items: cartData?.items,
-  //         total: cartData?.total,
-  //         delivery: cartData?.delivery,
-  //         address: selectedDeliverAddress,
-  //       },
-  //       {
-  //         headers: { "Content-Type": "application/json", auth: token },
+  // useEffect(() => {
+  //   const buyerFilteredOrders = async (
+  //     from,
+  //     to,
+  //     excludesOrderStatuses,
+  //     includesOrderStatuses
+  //   ) => {
+  //     setReload(true);
+  //     try {
+  //       const response = await axios.get(
+  //         `${url}/order/buyerOrders?excludesOrderStatuses=${excludesOrderStatuses}&includesOrderStatuses=${includesOrderStatuses}&from=${from}&to=${to}`,
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             auth: token,
+  //           },
+  //         }
+  //       );
+
+  //       if (response.data.success) {
+  //         setOrdersData(response.data.data);
+  //         console.log("OrdersData", response.data.data);
+  //       } else {
+  //         // Handle failure case
+  //         console.error("Failed to fetch orders");
   //       }
-  //     );
-  //     if (response.data.success) {
-  //       setOrders(response.data.data);
-  //       toast.success("Order created successfully");
-  //     } else {
-  //       toast.error("Failed to create order. Please try again.");
+  //     } catch (error) {
+  //       console.error("Error fetching orders:", error);
+  //     } finally {
+  //       setReload(false);
   //     }
-  //   } catch (err) {
-  //     console.error("Error creating order:", err.response?.data || err.message);
-  //     toast.error("Failed to create order. Please try again.");
-  //   }
-  // };
+  //   };
 
-  //Buyer Order Filters
-  // const fetchOrders = async () => {
-  //   try {
-  //     const response = await axios.get(`${url}/order/buyerOrders`, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         auth: token,
-  //       },
-  //     });
-
-  //     // console.log("API Response:", response.data);
-  //     if (response.data.success) {
-  //       setOrders(response.data.orders);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching orders:", error);
-  //   }
-  // };
+  //   buyerFilteredOrders();
+  // }, [token]);
 
   return (
     <AuthContext.Provider
@@ -314,11 +304,9 @@ const AuthProvider = ({ children }) => {
         maxPrice,
         setMinPrice,
         setMaxPrice,
-        baseUrl,
+        imgUrl,
         url,
-        // orders,
-        // setOrders,
-        // createOrder,
+        // ordersData,
       }}
     >
       {children}

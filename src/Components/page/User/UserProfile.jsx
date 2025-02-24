@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../Context/AuthContext";
+import { AuthContext } from "../../../Context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./UserProfile.css";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ const UserProfile = () => {
         withCredentials: true,
       });
 
-      console.log("From the userProfile API", response.data);
+      // console.log("From the userProfile API", response.data);
       setUserImage(response.data.profileImage);
     } catch (err) {
       toast.error("Error fetching profile:", err);
@@ -76,7 +76,7 @@ const UserProfile = () => {
   };
 
   const handleYourOrders = () => {
-    navigate("/orders");
+    navigate("/order/history");
   };
 
   useEffect(() => {

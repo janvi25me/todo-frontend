@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { userValidationSchemaForLogin } from "./Validation";
+import { userValidationSchemaForLogin } from "../../Validation";
 import { useContext } from "react";
-import { AuthContext } from "../Context/AuthContext";
+import { AuthContext } from "../../../Context/AuthContext";
 
 const Login = () => {
   let navigate = useNavigate();

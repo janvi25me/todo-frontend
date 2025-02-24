@@ -5,19 +5,23 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
-import Login from "./Components/Login";
-import Signup from "./Components/Signup";
-import ProductList from "./Components/Product/ProductList";
+import Login from "./Components/page/Auth/Login";
+import Signup from "./Components/page/Auth/Signup";
+import ProductList from "./Components/page/Product/ProductList";
 import { useContext } from "react";
 import { AuthContext } from "./Context/AuthContext";
-import Layout from "./Layout/Layout";
-import NotFound from "./page/NotFound/NotFound";
-import Cart from "./page/Cart";
-import Home from "./Components/Home";
-import Address from "./page/Address";
-import Order from "./page/Order";
-import UserProfile from "./page/UserProfile";
-import OrderDetails from "./page/OrderDetails";
+import Layout from "./Components/page/Layout/Layout";
+import NotFound from "./Components/page/NotFound";
+import Cart from "./Components/page/Cart";
+import Home from "./Components/page/Home";
+import Address from "./Components/page/Address";
+import Order from "./Components/page/Order/Order";
+import UserProfile from "./Components/page/User/UserProfile";
+import OrderDetails from "./Components/page/Order/OrderDetails";
+import OrderHistory from "./Components/page/Order/OrderHistory";
+import Checkout from "./Components/page/Checkout";
+import Success from "./Components/page/Success";
+import Cancel from "./Components/page/Cancel";
 
 const App = () => {
   const { userInfo } = useContext(AuthContext);
@@ -64,13 +68,33 @@ const App = () => {
             loader={userCanAccessLoader}
           />
           <Route
-            path="/orderDetails"
+            path="/orderDetails/:orderId"
             element={<OrderDetails />}
+            loader={userCanAccessLoader}
+          />
+          <Route
+            path="/order/history"
+            element={<OrderHistory />}
             loader={userCanAccessLoader}
           />
           <Route
             path="address"
             element={<Address />}
+            loader={userCanAccessLoader}
+          />
+          <Route
+            path="checkout"
+            element={<Checkout />}
+            loader={userCanAccessLoader}
+          />
+          <Route
+            path="success"
+            element={<Success />}
+            loader={userCanAccessLoader}
+          />
+          <Route
+            path="cancel"
+            element={<Cancel />}
             loader={userCanAccessLoader}
           />
           <Route path="*" element={<NotFound />} />

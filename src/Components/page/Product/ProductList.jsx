@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import Popup from "reactjs-popup";
-import { AuthContext } from "../../Context/AuthContext";
+import { AuthContext } from "../../../Context/AuthContext";
 import { toast } from "sonner";
 // import AddTask from "./AddTask";
 
@@ -21,6 +21,7 @@ const ProductList = () => {
   // const [reload, setReload] = useState(false);
 
   const {
+    imgUrl,
     userInfo,
     addToCart,
     products,
@@ -61,7 +62,7 @@ const ProductList = () => {
         withCredentials: true,
       });
 
-      // console.log("AT ADDTASK", response.data);
+      console.log("AT ADDTASK", response.data);
 
       setAddTask({ name: "", description: "", price: "" });
       setImage(null); // Clear the file input state
@@ -177,9 +178,6 @@ const ProductList = () => {
     setIsOpen(!isOpen);
   };
 
-  let baseUrl = "https://526d-103-106-20-199.ngrok-free.app";
-  // let imagePath = products?.image?.replace(/\\/g, "/");
-
   return (
     <>
       <div className={deleteTodo ? "filter blur-sm pointer-events-none" : ""}>
@@ -206,7 +204,7 @@ const ProductList = () => {
                 onClick={handleFilterToggle}
                 className="ml-3 px-2 py-2 text-white border border-purple-600 bg-purple-600 rounded-lg hover:bg-purple-800 hover:border-purple-800 transition"
               >
-                <i className="fa-solid fa-filter"></i>Filter
+                <i className="fa-solid fa-filter"></i>
               </button>
 
               {/* Popup */}
@@ -312,7 +310,7 @@ const ProductList = () => {
                       <div>
                         {/* Image added without affecting other fields */}
                         <img
-                          src={`${baseUrl}/${imagePath}`}
+                          src={`${imgUrl}/${imagePath}`}
                           alt={todo?.name}
                           className="w-full h-64 object-cover-fit rounded-t-lg"
                         />
