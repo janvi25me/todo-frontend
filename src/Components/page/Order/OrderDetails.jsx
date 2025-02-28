@@ -9,12 +9,18 @@ const OrderDetails = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { url, token, imgUrl } = useContext(AuthContext);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  const { url, token, imgUrl, userInfo } = useContext(AuthContext);
   const { orderId } = useParams();
 
-  // const handleRemove = (pid) => {
-  //   removeProductFromCart(pid);
-  // };
+  // console.log("Orderid", orderId);
+
+  // console.log("USer", userInfo);
+  // console.log("%", userInfo.user.id);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -45,6 +51,13 @@ const OrderDetails = () => {
     fetchOrder();
   }, [orderId, url, token]);
 
+  // console.log("ProductId", selectedProduct);
+
+  const handleAddOtpClick = (productId) => {
+    setSelectedProduct(productId);
+    setIsModalOpen(true);
+  };
+
   // Function to handle order cancellation
   const handleCancelOrder = async () => {
     try {
@@ -71,6 +84,7 @@ const OrderDetails = () => {
       setIsModalOpen(false);
     }
   };
+
   // console.log("$", order);
   //Make Payment Code
   const makePayment = async () => {
@@ -106,6 +120,85 @@ const OrderDetails = () => {
     }
   };
 
+  const handleCheckboxChange = (productId) => {
+    setSelectedProducts((prev) => {
+      if (prev.includes(productId)) {
+        return prev.filter((id) => id !== productId); // Unselect
+      } else {
+        return [...prev, productId]; // Select
+      }
+    });
+  };
+
+  // console.log("ProductId", selectedProducts);
+
+  const handleStartDelivery = async () => {
+    if (selectedProducts.length === 0) {
+      toast.error("Please select at least one product to start delivery.");
+      return;
+    }
+
+    console.log("Order ID:", orderId);
+    console.log("Selected Product IDs:", selectedProducts);
+
+    try {
+      const response = await axios.patch(
+        `${url}/order/update`,
+        {
+          orderId: orderId,
+          productId: selectedProducts, // <-- Match the Postman key
+          action: "IN_TRANSIT",
+        },
+        {
+          headers: { "Content-Type": "application/json", auth: token },
+        }
+      );
+
+      if (response.data.success) {
+        toast.success("Delivery started. OTPs generated.");
+        // setIsOtpModalOpen(true);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error starting delivery:", error);
+      toast.error("Failed to start delivery.");
+    }
+  };
+
+  const handleVerifyOtp = async (productId) => {
+    try {
+      // console.log("%", productId);
+      const response = await axios.post(
+        `${url}/order/verifyOtp`,
+        {
+          orderId: orderId,
+          productId,
+          otp,
+        },
+        {
+          headers: { "Content-Type": "application/json", auth: token },
+        }
+      );
+
+      console.log("Otp", response.data);
+      if (response.data.success) {
+        toast.success("Order completed successfully!");
+        setOrder((prevOrder) => ({
+          ...prevOrder,
+          orderStatus: "COMPLETED",
+        }));
+        // setIsOtpModalOpen(false);
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      toast.error("Failed to verify OTP || Check the payemnt status.");
+    }
+  };
+
+  // console.log("@", order);
   if (loading) return <p>Loading...</p>;
   if (!order) return <p>Failed to fetch order.</p>;
 
@@ -160,13 +253,111 @@ const OrderDetails = () => {
                       </div>
                       <div className="flex flex-col justify-between">
                         <h2 className="text-lg font-semibold">{item.name}</h2>
-                        <p className="text-gray-600">{item.description}</p>
+                        <p className="text-gray-600">
+                          {item.description
+                            ? item.description
+                                .split(" ")
+                                .slice(0, 8)
+                                .join(" ") + "..."
+                            : "No description available"}
+                        </p>
                         <p className="text-gray-600">Price: ₹{item.price}</p>
                         <p className="text-gray-600">Quantity: {item.qty}</p>
+                        <p
+                          className={`text-white text-xs font-semibold px-2 py-1 rounded-md shadow w-fit ${
+                            item.productStatus === "COMPLETED"
+                              ? "bg-green-600"
+                              : item.productStatus === "IN_TRANSIT"
+                              ? "bg-blue-600"
+                              : item.productStatus === "CANCELLED"
+                              ? "bg-red-500"
+                              : "bg-yellow-500"
+                          }`}
+                        >
+                          {item.productStatus || "PENDING"}
+                        </p>
+                      </div>
+
+                      <div className="w-full md:w-1/3 flex items-start justify-end">
+                        {userInfo.user.role === "1" &&
+                          order.orderStatus === "IN_TRANSIT" && (
+                            <p className="text-blue-600 font-semibold animate-bounce">
+                              Your Otp is: {item.deliveryOtp}
+                            </p>
+                          )}
                       </div>
                     </div>
+
+                    {/* Show checkbox for product selection */}
+                    {userInfo.user.role == "2" &&
+                      order.orderStatus !== "COMPLETED" &&
+                      order.orderStatus !== "IN_TRANSIT" && (
+                        <div className="w-full md:w-1/3 flex items-start justify-end">
+                          <input
+                            type="checkbox"
+                            checked={selectedProducts.includes(item._id)}
+                            onChange={() => handleCheckboxChange(item._id)}
+                            className="w-5 h-5 accent-blue-500 cursor-pointer"
+                          />
+                        </div>
+                      )}
+
+                    {userInfo.user.role == "2" &&
+                      order.orderStatus !== "COMPLETED" &&
+                      order.orderStatus !== "IN_TRANSIT" && (
+                        <div className="w-full md:w-1/3 flex items-start justify-end">
+                          <button
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md"
+                            onClick={handleStartDelivery}
+                          >
+                            Start Delivery
+                          </button>
+                        </div>
+                      )}
+
+                    {/* OTP & Delivery handling for IN_TRANSIT */}
+                    {userInfo.user.role === "2" &&
+                      order.orderStatus === "IN_TRANSIT" && (
+                        <div className="w-full md:w-1/3 flex items-start justify-end">
+                          <button
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md"
+                            onClick={() => handleAddOtpClick(item._id)}
+                          >
+                            Add OTP
+                          </button>
+                        </div>
+                      )}
                   </div>
                 ))}
+
+              {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+                  <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                    <h2 className="text-xl font-semibold mb-4">Enter OTP</h2>
+                    <input
+                      type="text"
+                      placeholder="Enter OTP"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <div className="flex justify-end gap-4 mt-4">
+                      <button
+                        className="px-4 py-2 bg-green-400 text-white rounded-lg hover:bg-green-500"
+                        onClick={() => handleVerifyOtp(selectedProduct)}
+                      >
+                        Verify
+                      </button>
+                      <button
+                        className="px-4 py-2 bg-red-400 text-white rounded-lg hover:bg-red-00"
+                        onClick={() => setIsModalOpen(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="flex flex-col gap-4 p-6 border-b border-gray-300">
                 <p className="font-semibold text-lg">Buyer Info:</p>
@@ -197,14 +388,6 @@ const OrderDetails = () => {
                         }`}
                       >
                         {order.paymentStatus}
-                      </span>
-                    </p>
-
-                    <p>
-                      Delivery:{" "}
-                      <span className="text-blue-600">
-                        {" "}
-                        <strong>{order.deliveryStatus}</strong>
                       </span>
                     </p>
                   </>
@@ -241,25 +424,27 @@ const OrderDetails = () => {
       {/* Buttons */}
       {order.orderStatus !== "CANCELLED" &&
         order.orderStatus !== "COMPLETED" &&
-        order.paymentStatus !== "SUCCESS" && ( // Disable payment if already successful
+        order.paymentStatus !== "SUCCESS" && (
           <div className="flex justify-center items-center mt-4 mb-6 w-full gap-6">
             <button
               className="bg-red-400 hover:bg-red-500 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition duration-300"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsCancelModalOpen(true)}
             >
               Cancel Order
             </button>
-            <button
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition duration-300"
-              onClick={makePayment}
-            >
-              Make Payment
-            </button>
+            {userInfo.user.role == "1" && (
+              <button
+                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition duration-300"
+                onClick={makePayment}
+              >
+                Make Payment
+              </button>
+            )}
           </div>
         )}
 
       {/* Modal */}
-      {isModalOpen && (
+      {isCancelModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
             <h2 className="text-lg font-semibold mb-4">
@@ -268,7 +453,7 @@ const OrderDetails = () => {
             <div className="flex justify-between mt-4">
               <button
                 className="bg-gray-400 text-white px-4 py-2 rounded-lg"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => setIsCancelModalOpen(false)}
               >
                 Cancel
               </button>

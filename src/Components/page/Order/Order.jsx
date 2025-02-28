@@ -20,7 +20,7 @@ const Order = () => {
   const excludesOrderStatuses = encodeURIComponent("COMPLETED,CANCELLED");
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const fetchBuyerOrders = async () => {
       setReload(true);
       try {
         const todayResponse = await axios.get(
@@ -54,7 +54,44 @@ const Order = () => {
       }
     };
 
-    fetchOrders();
+    fetchBuyerOrders();
+  }, [token, url, page]);
+
+  useEffect(() => {
+    const fetchSellerOrders = async () => {
+      setReload(true);
+      try {
+        const todayResponse = await axios.get(
+          `${url}/order/sellerOrders?from=${today}&to=${today}&excludesOrderStatuses=${excludesOrderStatuses}&page=${page}&limit=3`,
+          { headers: { "Content-Type": "application/json", auth: token } }
+        );
+        const pastResponse = await axios.get(
+          `${url}/order/sellerOrders?to=${pastTo}&page=${page}&limit=3`,
+          { headers: { "Content-Type": "application/json", auth: token } }
+        );
+
+        setTodayOrders(
+          todayResponse.data.success ? todayResponse.data.orders : []
+        );
+        setPastOrders(
+          pastResponse.data.success ? pastResponse.data.orders : []
+        );
+
+        setTotalPages({
+          today: todayResponse.data.totalPages,
+          past: pastResponse.data.totalPages,
+        });
+      } catch (error) {
+        setTodayOrders([]);
+        setPastOrders([]);
+        console.error("Error fetching seller orders:", error);
+      } finally {
+        setReload(false);
+        setLoading(false);
+      }
+    };
+
+    fetchSellerOrders();
   }, [token, url, page]);
 
   const getOrderStatusClass = (status) => {

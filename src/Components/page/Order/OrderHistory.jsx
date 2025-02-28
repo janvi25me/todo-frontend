@@ -8,7 +8,7 @@ const OrderHistory = () => {
   const { url, token, setReload, imgUrl } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState("COMPLETED"); // Default tab
+  const [statusFilter, setStatusFilter] = useState("COMPLETED"); // default tab
 
   const toDate = moment().format("DD-MM-YYYY");
 
@@ -22,6 +22,7 @@ const OrderHistory = () => {
           { headers: { "Content-Type": "application/json", auth: token } }
         );
         setOrders(response.data.success ? response.data.orders : []);
+        // console.log("##", response.data);
       } catch (error) {
         console.error("Error fetching orders:", error);
         setOrders([]);
