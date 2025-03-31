@@ -9,7 +9,7 @@ const AuthProvider = ({ children }) => {
     const storedToken = localStorage.getItem("token");
     return storedToken || null;
   });
-
+  // console.log("token", token);
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [address, setAddress] = useState([]);
@@ -31,7 +31,6 @@ const AuthProvider = ({ children }) => {
   let imgUrl = "http://localhost:1000";
   // let baseUrl = "https://b785-103-106-20-199.ngrok-free.app";
 
-  //get user Token
   useEffect(() => {
     if (token) {
       localStorage.setItem("token", token);

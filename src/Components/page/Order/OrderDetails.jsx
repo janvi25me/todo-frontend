@@ -61,7 +61,7 @@ const OrderDetails = () => {
   // Function to handle order cancellation
   const handleCancelOrder = async () => {
     try {
-      const response = await axios.post(
+      const response = await axios.patch(
         `${url}/order/cancelOrder/${orderId}`,
         {},
         {
@@ -69,19 +69,23 @@ const OrderDetails = () => {
         }
       );
 
+      console.log("Cancel Order Response:", response.data);
+
       if (response.data.success) {
         toast.success("Order cancelled successfully");
+
         setOrder((prevOrder) => ({
           ...prevOrder,
           orderStatus: "CANCELLED",
         }));
+
+        setIsCancelModalOpen(false);
       } else {
-        toast.error("Failed to cancel order.");
+        toast.error(response.data.message || "Failed to cancel order.");
       }
     } catch (error) {
-      toast.error("Error cancelling order.", error);
-    } finally {
-      setIsModalOpen(false);
+      console.error("Cancel Order Error:", error);
+      toast.error(error.response?.data?.message || "Error cancelling order.");
     }
   };
 
@@ -209,9 +213,20 @@ const OrderDetails = () => {
         <div className="flex flex-col xl:flex-row gap-8">
           {/* Order Details */}
           <div className="flex-[3] bg-white p-6 shadow-lg rounded-lg">
-            <h1 className="text-2xl font-semibold text-center text-gray-800 mb-6">
-              Order Details
-            </h1>
+            <div className="mb-4">
+              <nav className="text-sm text-gray-600 mb-2">
+                <span className="text-blue-500 cursor-pointer">Home</span>
+                <span className="mx-2"> &gt; </span>
+                <span className="text-gray-800">Order</span>
+                <span className="mx-2"> &gt; </span>
+                <span className="text-gray-800">Order Detail</span>
+                {/* <span className="mx-2"> &gt; </span> */}
+                {/* <span className="text-gray-800">Order Details</span> */}
+              </nav>
+              {/* <h1 className="text-2xl font-semibold text-gray-800">
+                Order Details
+              </h1> */}
+            </div>
 
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-start gap-2">
@@ -291,7 +306,8 @@ const OrderDetails = () => {
                     {/* Show checkbox for product selection */}
                     {userInfo.user.role == "2" &&
                       order.orderStatus !== "COMPLETED" &&
-                      order.orderStatus !== "IN_TRANSIT" && (
+                      order.orderStatus !== "IN_TRANSIT" &&
+                      order.orderStatus !== "CANCELLED" && (
                         <div className="w-full md:w-1/3 flex items-start justify-end">
                           <input
                             type="checkbox"
@@ -304,7 +320,8 @@ const OrderDetails = () => {
 
                     {userInfo.user.role == "2" &&
                       order.orderStatus !== "COMPLETED" &&
-                      order.orderStatus !== "IN_TRANSIT" && (
+                      order.orderStatus !== "IN_TRANSIT" &&
+                      order.orderStatus !== "CANCELLED" && (
                         <div className="w-full md:w-1/3 flex items-start justify-end">
                           <button
                             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow-md"
@@ -330,6 +347,7 @@ const OrderDetails = () => {
                   </div>
                 ))}
 
+              {/* OTP Verification */}
               {isModalOpen && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
                   <div className="bg-white p-6 rounded-lg shadow-lg w-96">
@@ -359,6 +377,7 @@ const OrderDetails = () => {
                 </div>
               )}
 
+              {/* Buyer Details */}
               <div className="flex flex-col gap-4 p-6 border-b border-gray-300">
                 <p className="font-semibold text-lg">Buyer Info:</p>
                 <p>
@@ -396,6 +415,7 @@ const OrderDetails = () => {
             </div>
           </div>
 
+          {/* Price Summary */}
           <div className="flex-[1] p-6 bg-gray-100 shadow-lg rounded-lg w-[300px] h-[200px]">
             <h2 className="text-xl font-semibold text-gray-700 mb-4 text-center">
               Price Summary

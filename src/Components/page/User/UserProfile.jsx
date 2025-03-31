@@ -1,13 +1,11 @@
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../../../Context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import "./UserProfile.css";
 import { toast } from "sonner";
 
 const UserProfile = () => {
   const url = "http://localhost:1000/api";
-  const navigate = useNavigate();
 
   const { userInfo, selectedDeliverAddress } = useContext(AuthContext);
   const token = userInfo?.user?.token;
@@ -16,36 +14,24 @@ const UserProfile = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [userImage, setUserImage] = useState(null);
 
-  // Get Profile Image API
+  // Fetch user profile data
   const getUserProfile = async () => {
     try {
       const response = await axios.get(`${url}/user/profile/getProfile`, {
-        headers: {
-          auth: token,
-        },
+        headers: { auth: token },
         withCredentials: true,
       });
 
-      // console.log("From the userProfile API", response.data);
-      setUserImage(response.data.profileImage);
+      if (response.data.image) {
+        const imagePath = response.data.image.replace(/\\/g, "/");
+        setUserImage(`${url.replace("/api", "")}/${imagePath}`);
+      }
     } catch (err) {
       toast.error("Error fetching profile:", err);
     }
   };
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Post Image API
+  // Handle image upload
   const handleImageUpload = async () => {
     if (!selectedImage) {
       alert("Please select an image first");
@@ -64,117 +50,111 @@ const UserProfile = () => {
         withCredentials: true,
       });
       toast.success("Profile Image added successfully");
-      console.log("Image uploaded:", response.data);
-      setUserImage(response.data.profileImage);
+
+      if (response.data.profileImage) {
+        const imagePath = response.data.profileImage.replace(/\\/g, "/");
+        setUserImage(`${url.replace("/api", "")}/${imagePath}`);
+      }
+      setImagePreview(null);
+      setSelectedImage(null);
     } catch (err) {
       toast.error("Error uploading image:", err);
     }
   };
 
-  const handleAddAddress = () => {
-    navigate("/address");
-  };
-
-  const handleYourOrders = () => {
-    navigate("/order/history");
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   useEffect(() => {
-    if (token) {
-      getUserProfile();
-    }
+    if (token) getUserProfile();
   }, [token]);
 
   return (
-    <div className="p-5">
-      <h1 className="text-center text-xl mb-5">User Profile</h1>
-      <div className="flex justify-center items-center">
-        <div className="w-full max-w-lg">
-          <div className="border p-5 rounded-lg shadow-lg">
-            <div className="mb-5 text-center">
-              <strong>Email:</strong>{" "}
-              {userInfo?.user?.email || "No email available"}
-            </div>
-            <div className="mb-5 text-center">
-              <strong>Name:</strong> {userInfo?.user?.firstName}{" "}
-              {userInfo?.user?.lastName || "No last name available"}
-            </div>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-3xl bg-white p-6 rounded-2xl shadow-xl">
+        <div className="mb-4">
+          <nav className="text-sm text-gray-600 mb-2">
+            <span className="text-blue-500 cursor-pointer">Home</span>
+            <span className="mx-2"> &gt; </span>
+            <span className="text-gray-800">User Profile</span>
+          </nav>
+        </div>
 
-            {/* Image Upload Section */}
-            <div className="text-center">
-              <input
-                type="file"
-                onChange={handleImageChange}
-                accept="image/*"
-                className="border p-2 rounded-md"
-              />
+        <div className="flex flex-col items-center">
+          {userImage ? (
+            <img
+              src={userImage}
+              alt="User Profile"
+              className="w-40 h-40 object-cover rounded-full border-4 border-gray-300 shadow-md"
+            />
+          ) : (
+            <div className="w-40 h-40 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-full">
+              <span className="text-gray-400">No Image</span>
+            </div>
+          )}
+
+          <div className="mt-4">
+            <input
+              type="file"
+              onChange={handleImageChange}
+              accept="image/*"
+              className="hidden"
+              id="upload"
+            />
+            <label
+              htmlFor="upload"
+              className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+            >
+              {userImage ? "Update Profile Image" : "Add Image"}
+            </label>
+            {selectedImage && (
               <button
                 onClick={handleImageUpload}
-                className="mt-2 px-4 py-2 border rounded-md bg-blue-500 text-white"
+                className="ml-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
               >
-                Upload Image
+                Upload
               </button>
-
-              {/* Image Preview Section */}
-              {imagePreview && (
-                <div className="mt-3 flex justify-center">
-                  <img
-                    src={imagePreview}
-                    alt="Image Preview"
-                    className="w-32 h-32 object-cover rounded-full"
-                  />
-                </div>
-              )}
-
-              {/* Display User's Profile Image */}
-              {userImage && !imagePreview && (
-                <div className="mt-3 flex justify-center">
-                  <img
-                    src={userImage}
-                    alt="User Profile"
-                    className="w-32 h-32 object-cover rounded-full"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Delivery Address Section */}
-            {userInfo?.user?.role === "1" &&
-              (selectedDeliverAddress ? (
-                <div className="mb-4">
-                  <p className="text-gray-700 font-medium pt-3">
-                    <i className="fa-solid fa-location-dot"></i> Selected
-                    Delivery Address:
-                    <span className="block text-black font-semibold pb-3">
-                      {selectedDeliverAddress.myAddress}
-                    </span>
-                  </p>
-                </div>
-              ) : (
-                <div className="mt-4">
-                  <p className="text-gray-700 font-medium">
-                    You don{"'"}t have a delivery address yet.{" "}
-                    <button
-                      onClick={handleAddAddress}
-                      className="text-blue-500 underline"
-                    >
-                      Add Delivery Address
-                    </button>
-                  </p>
-                </div>
-              ))}
-
-            {/* Your Orders Button */}
-            <div className="mt-5 text-center">
-              <button
-                onClick={handleYourOrders}
-                className="px-4 py-2 border rounded-md bg-green-500 text-white"
-              >
-                <i className="fa-solid fa-clock-rotate-left"></i> &nbsp; Order
-                History
-              </button>
-            </div>
+            )}
           </div>
+        </div>
+
+        <div className="mt-6">
+          <p className="text-lg">
+            <strong>Name:</strong> {userInfo?.user?.firstName}{" "}
+            {userInfo?.user?.lastName}
+          </p>
+          <p className="text-lg">
+            <strong>Email:</strong> {userInfo?.user?.email}
+          </p>
+        </div>
+
+        {userInfo?.user?.role === "1" && selectedDeliverAddress && (
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold">
+              {" "}
+              <i className="fa-solid fa-location-dot mr-2"></i>Shipping Address
+            </h2>
+            <p className="text-gray-700 mt-2">
+              {selectedDeliverAddress.myAddress}
+            </p>
+          </div>
+        )}
+
+        <div className="mt-8 text-center">
+          <Link
+            to="/order/history"
+            className="inline-block bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg text-lg shadow-md"
+          >
+            <i className="fa-solid fa-clock-rotate-left mr-2"></i>
+            View Order History
+          </Link>
         </div>
       </div>
     </div>

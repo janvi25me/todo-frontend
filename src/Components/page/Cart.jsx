@@ -63,9 +63,16 @@ const Cart = () => {
   return (
     <>
       <div className="bg-white p-6 rounded-lg ">
-        <h2 className="text-3xl font-semibold text-center text-purple-800 mb-6 mt-5">
-          Products
-        </h2>
+        <div className="mb-4">
+          <nav className="text-sm text-gray-600 mb-2">
+            <span className="text-blue-500 cursor-pointer">Home</span>
+            <span className="mx-2"> &gt; </span>
+            <span className="text-gray-800">Products</span>
+            <span className="mx-2"> &gt; </span>
+            <span className="text-gray-800">Cart</span>
+          </nav>
+          {/* <h1 className="text-2xl font-semibold text-gray-800">Orders</h1> */}
+        </div>
 
         {cart?.data?.items?.length > 0 ? (
           cart.data.items.map((item) => {

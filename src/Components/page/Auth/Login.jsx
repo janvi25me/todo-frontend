@@ -37,6 +37,8 @@ const Login = () => {
       setToken(token);
       setUserInfo(userDetails);
 
+      console.log("%", userDetails);
+
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userDetails));
 
@@ -50,6 +52,10 @@ const Login = () => {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:1000/auth/google";
+  };
+
   const onSubmit = async (data) => {
     // console.log("Form data:", data);
     await login(data);
@@ -57,7 +63,14 @@ const Login = () => {
 
   return (
     <>
-      <h3 className="text-center text-xl font-semibold mb-4">User Login</h3>
+      <div className="mb-4">
+        <nav className="text-sm text-gray-600 mb-2">
+          <span className="text-blue-500 cursor-pointer">Home</span>
+          <span className="mx-2"> &gt; </span>
+          <span className="text-gray-800">Login</span>
+        </nav>
+        {/* <h1 className="text-2xl font-semibold text-gray-800">Orders</h1> */}
+      </div>
       <div className="my-8  p-6 container mx-auto max-w-lg border-2 bg-gray-100 rounded-lg">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="relative mb-5">
@@ -104,12 +117,24 @@ const Login = () => {
             )}
           </div>
 
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center gap-4 mt-6">
             <button
               type="submit"
               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
             >
               Login
+            </button>
+            <span className="text-gray-500 font-medium">OR</span>
+            <button
+              onClick={handleGoogleLogin}
+              className="flex items-center gap-2 px-5 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300 ease-in-out"
+            >
+              <img
+                src="https://logowik.com/content/uploads/images/985_google_g_icon.jpg"
+                alt="Google"
+                className="w-5 h-5"
+              />
+              Sign in with Google
             </button>
           </div>
         </form>

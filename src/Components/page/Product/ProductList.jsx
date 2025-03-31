@@ -180,6 +180,14 @@ const ProductList = () => {
 
   return (
     <>
+      <div className="mb-4">
+        <nav className="text-sm text-gray-600 mb-2 flex items-center mx-5">
+          <span className="text-blue-500 cursor-pointer">Home</span>
+          <span className="mx-3"> &gt; </span>
+          <span className="text-gray-800">Products</span>
+        </nav>
+      </div>
+
       <div className={deleteTodo ? "filter blur-sm pointer-events-none" : ""}>
         {/* Center: Search Bar */}
 
@@ -344,7 +352,7 @@ const ProductList = () => {
                       {userInfo?.user?.role === "1" && (
                         <button
                           onClick={() => addToCart(todo?._id)}
-                          className="mt-4 px-2 py-2 text-purple-800 border border-purple-800 rounded-lg hover:bg-purple-800 hover:text-white transition"
+                          className="mt-4 px-4 py-2 text-purple-800 border border-purple-800 rounded-lg hover:bg-purple-800 hover:text-white transition"
                         >
                           Add to Cart
                         </button>
@@ -355,7 +363,7 @@ const ProductList = () => {
                         <div className="flex space-x-2 mt-4">
                           <button
                             onClick={() => setEditTodo(todo)}
-                            className="px-3 py-1 text-purple-800 border border-purple-800 rounded-lg hover:bg-purple-800 hover:text-white transition"
+                            className="w-full px-3 py-1 text-purple-800 border border-purple-800 rounded-lg hover:bg-purple-800 hover:text-white transition"
                           >
                             Edit
                           </button>
@@ -394,7 +402,7 @@ const ProductList = () => {
 
                           <button
                             onClick={() => setDeleteTodo(todo)}
-                            className="px-3 py-1 text-red-800 border border-red-800 rounded-lg hover:bg-red-800 hover:text-white transition"
+                            className="w-full px-4 py-2 text-red-800 border border-red-800 rounded-lg hover:bg-red-800 hover:text-white transition"
                           >
                             Delete
                           </button>

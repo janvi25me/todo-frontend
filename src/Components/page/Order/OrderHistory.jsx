@@ -10,6 +10,19 @@ const OrderHistory = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("COMPLETED"); // default tab
 
+  // const [showPastOrders, setShowPastOrders] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const handleNextPage = () => {
+    if (page < totalPages) setPage(page + 1);
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 1) setPage(page - 1);
+  };
+
   const toDate = moment().format("DD-MM-YYYY");
 
   useEffect(() => {
@@ -18,14 +31,20 @@ const OrderHistory = () => {
       setLoading(true);
       try {
         const response = await axios.get(
-          `${url}/order/buyerOrders?to=${toDate}&includesOrderStatuses=${statusFilter}`,
+          `${url}/order/buyerOrders?to=${toDate}&includesOrderStatuses=${statusFilter}&page=${page}&limit=3`,
           { headers: { "Content-Type": "application/json", auth: token } }
         );
-        setOrders(response.data.success ? response.data.orders : []);
-        // console.log("##", response.data);
+        if (response.data.success) {
+          setOrders(response.data.orders);
+          setTotalPages(response.data.totalPages);
+        } else {
+          setOrders([]);
+          setTotalPages(0);
+        }
       } catch (error) {
         console.error("Error fetching orders:", error);
         setOrders([]);
+        setTotalPages(0);
       } finally {
         setReload(false);
         setLoading(false);
@@ -33,7 +52,36 @@ const OrderHistory = () => {
     };
 
     fetchOrders();
-  }, [statusFilter, token, url]);
+  }, [statusFilter, token, url, page]);
+
+  useEffect(() => {
+    const fetchSellerOrders = async () => {
+      setReload(true);
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `${url}/order/sellerOrders?to=${toDate}&includesOrderStatuses=${statusFilter}&page=${page}&limit=3`,
+          { headers: { "Content-Type": "application/json", auth: token } }
+        );
+        if (response.data.success) {
+          setOrders(response.data.orders);
+          setTotalPages(response.data.totalPages);
+        } else {
+          setOrders([]);
+          setTotalPages(0);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        setOrders([]);
+        setTotalPages(0);
+      } finally {
+        setReload(false);
+        setLoading(false);
+      }
+    };
+
+    fetchSellerOrders();
+  }, [statusFilter, token, url, page]);
 
   const getOrderStatusClass = (status) => {
     return status === "COMPLETED"
@@ -43,9 +91,16 @@ const OrderHistory = () => {
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-4">
-        Order History
-      </h1>
+      <div className="mb-4">
+        <nav className="text-sm text-gray-600 mb-2">
+          <span className="text-blue-500 cursor-pointer">Home</span>
+          <span className="mx-2"> &gt; </span>
+          <span className="text-gray-800">User Profile</span>
+          <span className="mx-2"> &gt; </span>
+          <span className="text-gray-800">Order History</span>
+        </nav>
+        {/* <h1 className="text-2xl font-semibold text-gray-800">Orders</h1> */}
+      </div>
 
       {/* Tabs for Completed & Cancelled Orders */}
       <div className="flex justify-center space-x-2 mb-4">
@@ -57,7 +112,7 @@ const OrderHistory = () => {
               : "bg-gray-200 text-gray-800"
           }`}
         >
-          Completed Orders
+          Completed
         </button>
         <button
           onClick={() => setStatusFilter("CANCELLED")}
@@ -67,7 +122,7 @@ const OrderHistory = () => {
               : "bg-gray-200 text-gray-800"
           }`}
         >
-          Cancelled Orders
+          Cancelled
         </button>
       </div>
 
@@ -146,6 +201,27 @@ const OrderHistory = () => {
           {orders.length === 0 && (
             <p className="text-center text-gray-500">No orders found.</p>
           )}
+
+          <div className="flex justify-between items-center mt-4">
+            <button
+              onClick={handlePreviousPage}
+              disabled={page === 1}
+              className="px-4 py-2 bg-purple-200 text-gray-600 rounded-lg disabled:opacity-50"
+            >
+              Prev
+            </button>
+            <span className="text-purple-800 font-semibold">
+              Page {page} of {totalPages || 1}
+            </span>
+
+            <button
+              onClick={handleNextPage}
+              disabled={page === totalPages}
+              className="px-4 py-2 bg-purple-200 text-gray-600 rounded-lg disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
     </div>

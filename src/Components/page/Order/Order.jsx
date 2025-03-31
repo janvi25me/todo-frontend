@@ -61,12 +61,15 @@ const Order = () => {
     const fetchSellerOrders = async () => {
       setReload(true);
       try {
+        // Fetch today's orders (excluding COMPLETED and CANCELLED)
         const todayResponse = await axios.get(
           `${url}/order/sellerOrders?from=${today}&to=${today}&excludesOrderStatuses=${excludesOrderStatuses}&page=${page}&limit=3`,
           { headers: { "Content-Type": "application/json", auth: token } }
         );
+
+        // Fetch past orders (also excluding COMPLETED and CANCELLED)
         const pastResponse = await axios.get(
-          `${url}/order/sellerOrders?to=${pastTo}&page=${page}&limit=3`,
+          `${url}/order/sellerOrders?to=${pastTo}&excludesOrderStatuses=${excludesOrderStatuses}&page=${page}&limit=3`,
           { headers: { "Content-Type": "application/json", auth: token } }
         );
 
@@ -120,7 +123,14 @@ const Order = () => {
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-4">Orders</h1>
+      <div className="mb-4">
+        <nav className="text-sm text-gray-600 mb-2">
+          <span className="text-blue-500 cursor-pointer">Home</span>
+          <span className="mx-2"> &gt; </span>
+          <span className="text-gray-800">Orders</span>
+        </nav>
+        {/* <h1 className="text-2xl font-semibold text-gray-800">Orders</h1> */}
+      </div>
 
       {/* Toggle Buttons */}
       <div className="flex justify-center space-x-2 mb-4">

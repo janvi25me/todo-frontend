@@ -124,6 +124,14 @@ const Address = () => {
   return (
     <>
       <div>
+        <div className="mb-4">
+          <nav className="text-sm text-gray-600 mb-2 mx-5">
+            <span className="text-blue-500 cursor-pointer">Home</span>
+            <span className="mx-3"> &gt; </span>
+            <span className="text-gray-800">Address</span>
+          </nav>
+        </div>
+
         <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md mx-auto mt-10 mb-10">
           <div className="flex justify-center mb-6">
             <button
